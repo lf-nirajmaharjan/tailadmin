@@ -1,7 +1,7 @@
 import {
-    flexRender,
-    getCoreRowModel,
-    useReactTable,
+  flexRender,
+  getCoreRowModel,
+  useReactTable,
 } from "@tanstack/react-table";
 
 interface ITable {

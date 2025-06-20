@@ -4,7 +4,7 @@ import "dotenv/config";
 import cors from 'cors';
 import sequelize from "./config/db.js";
 import "./models/Employee.js";
-import employeeRoutes from "./routes/employeeRoutes.js";
+import router from "./routes/employeeRoutes.js";
 
 
 const app = express();
@@ -13,7 +13,7 @@ const PORT = process.env.PORT || 4000;
 app.use(express.json());
 app.use(cors());
 
-app.use("/api/employees", employeeRoutes);
+app.use("/api/employees", router);
 
 
 // Sync DB and start server

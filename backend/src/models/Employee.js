@@ -1,7 +1,7 @@
 import { DataTypes } from "sequelize";
 import sequelize from "../config/db.js";
 
-const Employee = sequelize.define("Employee", {
+ const Employee = sequelize.define("Employee", {
   name: {
     type: DataTypes.STRING,
     allowNull: false,
@@ -17,15 +17,23 @@ const Employee = sequelize.define("Employee", {
     type: DataTypes.INTEGER,
     defaultValue: 0,
   },
-  startDate: {
-    type: DataTypes.DATE,
-    allowNull: false,
-  },
-  salary: {
-    type: DataTypes.FLOAT,
-    allowNull: false,
-  },
   image: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  email: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  status: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  phone: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  address: {
     type: DataTypes.STRING,
     allowNull: true,
   },

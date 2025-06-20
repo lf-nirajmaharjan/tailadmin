@@ -1,41 +1,58 @@
 import { createColumnHelper } from "@tanstack/react-table";
 import { useEffect, useState } from "react";
-import { LuPencil, LuTrash2 } from "react-icons/lu";
+import { LuChevronDown, LuPencil, LuSearch, LuTrash2 } from "react-icons/lu";
 import { MdAdd } from "react-icons/md";
 import Table from "./Table";
+import Modal from "./Modal";
+import AddEmployeeModal from "./AddEmployeeModal";
 
-type Person = {
+export interface IAddEmployeeForm {
   name: string;
-  position: string;
   age: number;
-  salary: number;
-  office: number;
-  startDate: string;
-  image: string;
+  email: string;
+  position: string;
+  office: string;
+  phone: string;
+  address: string;
+  status: string;
+  avatar: FileList;
   actions: string;
-};
+}
 
-const columnHelper = createColumnHelper<Person>();
+const columnHelper = createColumnHelper<IAddEmployeeForm>();
 
 const columns = [
   columnHelper.accessor("name", {
-    cell: (info) => info.getValue(),
+    cell: (info) => {
+      return (
+        <>
+          <p className="block text-theme-sm font-medium text-gray-800 dark:text-white/90">
+            {info.row.original.name}
+          </p>
+
+          <span className="text-sm text-gray-500 dark:text-gray-400">
+            {info.row.original.email}
+          </span>
+        </>
+      );
+    },
   }),
+
   columnHelper.accessor("age", {
-    cell: (info) => <i>{info.getValue()}</i>,
     header: () => <span>age</span>,
   }),
   columnHelper.accessor("position", {
     header: () => <span>Position</span>,
-    cell: (info) => info.renderValue(),
   }),
   columnHelper.accessor("office", {
     header: () => <span>Office</span>,
-    footer: (info) => info.column.id,
   }),
-  columnHelper.accessor("startDate", {
-    header: () => <span>Start Date</span>,
-    footer: (info) => info.column.id,
+  columnHelper.accessor("status", {
+    header: () => <span>Status</span>,
+  }),
+
+  columnHelper.accessor("phone", {
+    header: () => <span>Phone</span>,
   }),
 
   columnHelper.accessor("actions", {
@@ -54,7 +71,8 @@ const columns = [
 ];
 
 const EmployeeTable = () => {
-  const [employees, setEmployees] = useState([]);
+  const [employees, setEmployees] = useState<IAddEmployeeForm[]>([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const fetchEmployees = async () => {
     try {
@@ -73,6 +91,12 @@ const EmployeeTable = () => {
     fetchEmployees();
   }, []);
 
+  const handleModalClose = () => {
+    setIsModalOpen(false);
+  };
+  const handleModalOpen = () => {
+    setIsModalOpen(true);
+  };
   return (
     <>
       <div className="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
@@ -108,22 +132,7 @@ const EmployeeTable = () => {
                     </option>
                   </select>
                   <span className="absolute right-2 top-1/2 z-30 -translate-y-1/2 text-gray-500 dark:text-gray-400">
-                    <svg
-                      className="stroke-current"
-                      width="16"
-                      height="16"
-                      viewBox="0 0 16 16"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M3.8335 5.9165L8.00016 10.0832L12.1668 5.9165"
-                        stroke=""
-                        stroke-width="1.2"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                      ></path>
-                    </svg>
+                    <LuChevronDown size={16} />
                   </span>
                 </div>
                 <span className="text-gray-500 dark:text-gray-400">
@@ -134,21 +143,7 @@ const EmployeeTable = () => {
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
                 <div className="relative">
                   <button className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400">
-                    <svg
-                      className="fill-current"
-                      width="20"
-                      height="20"
-                      viewBox="0 0 20 20"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        fill-rule="evenodd"
-                        clip-rule="evenodd"
-                        d="M3.04199 9.37363C3.04199 5.87693 5.87735 3.04199 9.37533 3.04199C12.8733 3.04199 15.7087 5.87693 15.7087 9.37363C15.7087 12.8703 12.8733 15.7053 9.37533 15.7053C5.87735 15.7053 3.04199 12.8703 3.04199 9.37363ZM9.37533 1.54199C5.04926 1.54199 1.54199 5.04817 1.54199 9.37363C1.54199 13.6991 5.04926 17.2053 9.37533 17.2053C11.2676 17.2053 13.0032 16.5344 14.3572 15.4176L17.1773 18.238C17.4702 18.5309 17.945 18.5309 18.2379 18.238C18.5308 17.9451 18.5309 17.4703 18.238 17.1773L15.4182 14.3573C16.5367 13.0033 17.2087 11.2669 17.2087 9.37363C17.2087 5.04817 13.7014 1.54199 9.37533 1.54199Z"
-                        fill=""
-                      ></path>
-                    </svg>
+                    <LuSearch size={16} />
                   </button>
 
                   <input
@@ -159,7 +154,10 @@ const EmployeeTable = () => {
                   />
                 </div>
 
-                <button className="flex w-full items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-[11px] text-sm font-medium text-gray-700 shadow-theme-xs dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 sm:w-auto">
+                <button
+                  className="flex w-full items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-[11px] text-sm font-medium text-gray-700 shadow-theme-xs dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 sm:w-auto"
+                  onClick={handleModalOpen}
+                >
                   <MdAdd size={20} />
                   Add New Employee
                 </button>
@@ -167,6 +165,14 @@ const EmployeeTable = () => {
             </div>
 
             <Table data={employees} columns={columns} />
+            {isModalOpen && (
+              <Modal onClose={handleModalClose}>
+                <AddEmployeeModal
+                  setEmployees={setEmployees}
+                  setIsModalOpen={setIsModalOpen}
+                />
+              </Modal>
+            )}
           </div>
         </div>
       </div>
